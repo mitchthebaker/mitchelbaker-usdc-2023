@@ -28,6 +28,7 @@
   };
 
   if(!Array.isArray(scannedTextObj)) return result;
+  if(scannedTextObj.length === 0) return result;
   
   return result; 
 }
@@ -86,53 +87,67 @@ _   _ _   _ ___ _____   _____ _____ ____ _____ ____
 * */
 
 /** We can check that, given a known input, we get a known output. */
-const test1result = findSearchTermInBooks("the", twentyLeaguesIn);
-if (JSON.stringify(twentyLeaguesOut) === JSON.stringify(test1result)) {
+const test1Result = findSearchTermInBooks("the", twentyLeaguesIn);
+if (JSON.stringify(twentyLeaguesOut) === JSON.stringify(test1Result)) {
   console.log("PASS: Test 1");
 } else {
   console.log("FAIL: Test 1");
   console.log("Expected:", twentyLeaguesOut);
-  console.log("Received:", test1result);
+  console.log("Received:", test1Result);
 }
 
 /** We could choose to check that we get the right number of results. */
-const test2result = findSearchTermInBooks("the", twentyLeaguesIn); 
-if (test2result.Results.length == 1) {
+const test2Result = findSearchTermInBooks("the", twentyLeaguesIn); 
+if (test2Result.Results.length == 1) {
   console.log("PASS: Test 2");
 } else {
   console.log("FAIL: Test 2");
   console.log("Expected:", twentyLeaguesOut.Results.length);
-  console.log("Received:", test2result.Results.length);
+  console.log("Received:", test2Result.Results.length);
 }
+
+/** initial result of `findSearchTermInBooks()`  */
+const initialResult = {
+  "SearchTerm": "the",
+  "Results": []
+};
 
 /** 
  * An array of JSON objects should be passed into `scannedTextObj`. 
  * If we receive an object, string, number, or null/undefined, 
  * then the initial `result` should be returned. 
  */
-const result = {
-  "SearchTerm": "the",
-  "Results": []
+const invalidScannedTextObj = {
+  "Test 3": {}, 
+  "Test 4": "Twenty thousand leagues", 
+  "Test 5": 31, 
+  "Test 6": null, 
+  "Test 7": undefined
 };
 
-// Test when passing in an object for `scannedTextObj`
-const test3result = findSearchTermInBooks("the", {});
-if(JSON.stringify(result) === JSON.stringify(test3result)) {
-  console.log("PASS: Test 3");
-}
-else {
-  console.log("FAIL: Test 3");
-  console.log("Expected:", result);
-  console.log("Received:", test3result);
+for(const key in invalidScannedTextObj) {
+  const testResult = findSearchTermInBooks("the", invalidScannedTextObj[key]);
+  if(JSON.stringify(initialResult) === JSON.stringify(testResult)) {
+    console.log(`PASS: ${key}`);
+  }
+  else {
+    console.log(`FAIL: ${key}`);
+    console.log("Expected:", initialResult);
+    console.log("Received:", testResult);
+  }
 }
 
-// Test when passing in a string for `scannedTextObj`
-const test4result = findSearchTermInBooks("the", "Twenty Thousand Leagues Under the Sea");
-if(JSON.stringify(result) === JSON.stringify(test4result)) {
-  console.log("PASS: Test 4");
+/** If `scannedTextObj` has a length of zero, then return the initial result */
+const test8Result = findSearchTermInBooks("the", []); 
+if (JSON.stringify(initialResult) === JSON.stringify(test8Result)) {
+  console.log("PASS: Test 8");
+} else {
+  console.log("FAIL: Test 8");
+  console.log("Expected:", initialResult);
+  console.log("Received:", test8Result);
 }
-else {
-  console.log("FAIL: Test 4");
-  console.log("Expected:", result);
-  console.log("Received:", test4result);
-}
+
+
+
+
+
