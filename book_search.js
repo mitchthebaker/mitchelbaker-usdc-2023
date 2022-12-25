@@ -18,50 +18,6 @@
  * @param {JSON} scannedTextObj - A JSON object representing the scanned text.
  * @returns {JSON} - Search results.
  * */ 
- function findSearchTermInBooksBruteForce(searchTerm, scannedTextObj) {
-
-  const result = {
-      "SearchTerm": searchTerm,
-      "Results": []
-  };
-  
-  const validSearchTerm = typeof searchTerm !== "string";
-  if(validSearchTerm) return result;
-
-  const validScannedTextObj = !Array.isArray(scannedTextObj) || scannedTextObj.length === 0 || scannedTextObj === null || scannedTextObj === undefined;
-  if(validScannedTextObj) return result;
-
-  /** 
-   * If we've reached this point we can infer that we have a valid search term
-   * and an array of at least one JSON object
-   */
-  let searchTermRegex = new RegExp(`\\b${searchTerm}\\b`);
-  
-  for(const obj of scannedTextObj) {
-    if(obj.Content.length === 0) continue;
-
-    for(const item of obj.Content) {
-      let match = item.Text.match(searchTermRegex);
-        
-      if(match !== null) {
-        result.Results.push({
-          "ISBN": obj.ISBN,
-          "Page": item.Page,
-          "Line": item.Line
-        });
-      }
-    }
-  }
-  
-  return result; 
-}
-
-/**
- * Searches for matches in scanned text.
- * @param {string} searchTerm - The word or term we're searching for. 
- * @param {JSON} scannedTextObj - A JSON object representing the scanned text.
- * @returns {JSON} - Search results.
- * */ 
  function findSearchTermInBooks(searchTerm, scannedTextObj) {
 
   const result = {
@@ -80,7 +36,7 @@
    * and an array of at least one JSON object
    */
   let searchTermRegex = new RegExp(`\\b${searchTerm}\\b`);
-
+  
   for(const obj of scannedTextObj) {
     if(obj.Content.length === 0) continue;
 
