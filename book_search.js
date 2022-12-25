@@ -18,6 +18,50 @@
  * @param {JSON} scannedTextObj - A JSON object representing the scanned text.
  * @returns {JSON} - Search results.
  * */ 
+ function findSearchTermInBooksBruteForce(searchTerm, scannedTextObj) {
+
+  const result = {
+      "SearchTerm": searchTerm,
+      "Results": []
+  };
+  
+  const validSearchTerm = typeof searchTerm !== "string";
+  if(validSearchTerm) return result;
+
+  const validScannedTextObj = !Array.isArray(scannedTextObj) || scannedTextObj.length === 0 || scannedTextObj === null || scannedTextObj === undefined;
+  if(validScannedTextObj) return result;
+
+  /** 
+   * If we've reached this point we can infer that we have a valid search term
+   * and an array of at least one JSON object
+   */
+  let searchTermRegex = new RegExp(`\\b${searchTerm}\\b`);
+  
+  for(const obj of scannedTextObj) {
+    if(obj.Content.length === 0) continue;
+
+    for(const item of obj.Content) {
+      let match = item.Text.match(searchTermRegex);
+        
+      if(match !== null) {
+        result.Results.push({
+          "ISBN": obj.ISBN,
+          "Page": item.Page,
+          "Line": item.Line
+        });
+      }
+    }
+  }
+  
+  return result; 
+}
+
+/**
+ * Searches for matches in scanned text.
+ * @param {string} searchTerm - The word or term we're searching for. 
+ * @param {JSON} scannedTextObj - A JSON object representing the scanned text.
+ * @returns {JSON} - Search results.
+ * */ 
  function findSearchTermInBooks(searchTerm, scannedTextObj) {
 
   const result = {
@@ -36,21 +80,22 @@
    * and an array of at least one JSON object
    */
   let searchTermRegex = new RegExp(`\\b${searchTerm}\\b`);
-  scannedTextObj.forEach(obj => {
-    if(obj.Content.length !== 0) {
-      obj.Content.forEach(item => {
-        let match = item.Text.match(searchTermRegex);
+
+  for(const obj of scannedTextObj) {
+    if(obj.Content.length === 0) continue;
+
+    for(const item of obj.Content) {
+      let match = item.Text.match(searchTermRegex);
         
-        if(match !== null) {
-          result.Results.push({
-            "ISBN": obj.ISBN,
-            "Page": item.Page,
-            "Line": item.Line
-          });
-        }
-      });
+      if(match !== null) {
+        result.Results.push({
+          "ISBN": obj.ISBN,
+          "Page": item.Page,
+          "Line": item.Line
+        });
+      }
     }
-  });
+  }
   
   return result; 
 }
@@ -238,6 +283,27 @@ if (JSON.stringify(initialResult) === JSON.stringify(test13Result)) {
     "Title": "Siddhartha",
     "ISBN": "8503845691257",
     "Content": [] 
+  },
+  {
+    "Title": "To Kill a Mockingbird",
+    "ISBN": "5894021849573",
+    "Content": [
+      {
+        "Page": 10,
+        "Line": 1,
+        "Text": "test line 1 the",
+      },
+      {
+        "Page": 10,
+        "Line": 2,
+        "Text": "The cat jumped over lazy dog"
+      },
+      {
+        "Page": 10,
+        "Line": 3,
+        "Text": "The cat jumped over the lazy dog"
+      },
+    ] 
   }
 ];
   
@@ -245,23 +311,29 @@ const test14MockOutput = {
   "SearchTerm": "the",
   "Results": [
       {
-          "ISBN": "9780000528531",
-          "Page": 31,
-          "Line": 9
+        "ISBN": "9780000528531",
+        "Page": 31,
+        "Line": 9
       },
       {
-        "ISBN": "9780000528532",
-        "Page": 32,
-        "Line": 10
-    }
+        "ISBN": "5894021849573",
+        "Page": 10,
+        "Line": 1
+      },
+      {
+        "ISBN": "5894021849573",
+        "Page": 10,
+        "Line": 3
+      }
   ]
 };
 
-/** Add each ISBN into an array, test passes if there is only one ISBN  */
+/** Add each unique ISBN into a set, then confirm if we only have two ISBNs */
 const test14Result = findSearchTermInBooks("the", test14MockObj);
-const test14ResultLength = test14Result.Results.map(result => result.ISBN).length;
-console.log(test14ResultLength);
-if (test14ResultLength === 1) {
+const uniqueISBN = new Set();
+test14Result.Results.map(result => uniqueISBN.add(result.ISBN));
+
+if (uniqueISBN.size === 2) {
   console.log("PASS: Test 14");
 } else {
   console.log("FAIL: Test 14");
