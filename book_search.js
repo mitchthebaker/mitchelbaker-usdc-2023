@@ -19,16 +19,38 @@
  * @returns {JSON} - Search results.
  * */ 
  function findSearchTermInBooks(searchTerm, scannedTextObj) {
-  /** You will need to implement your search and 
-   * return the appropriate object here. */
 
   const result = {
       "SearchTerm": searchTerm,
       "Results": []
   };
+  
+  const validSearchTerm = typeof searchTerm !== "string";
+  if(validSearchTerm) return result;
 
-  if(!Array.isArray(scannedTextObj)) return result;
-  if(scannedTextObj.length === 0) return result;
+  const validScannedTextObj = !Array.isArray(scannedTextObj) || scannedTextObj.length === 0 || scannedTextObj === null || scannedTextObj === undefined;
+  if(validScannedTextObj) return result;
+
+  /** 
+   * If we've reached this point we can infer that we have a valid search term
+   * and an array of at least one JSON object
+   */
+  let searchTermRegex = new RegExp(`\\b${searchTerm}\\b`);
+  scannedTextObj.forEach(obj => {
+    if(obj.Content.length !== 0) {
+      obj.Content.forEach(item => {
+        let match = item.Text.match(searchTermRegex);
+        
+        if(match !== null) {
+          result.Results.push({
+            "ISBN": obj.ISBN,
+            "Page": item.Page,
+            "Line": item.Line
+          });
+        }
+      });
+    }
+  });
   
   return result; 
 }
@@ -36,39 +58,39 @@
 /** Example input object. */
 const twentyLeaguesIn = [
   {
-      "Title": "Twenty Thousand Leagues Under the Sea",
-      "ISBN": "9780000528531",
-      "Content": [
-          {
-              "Page": 31,
-              "Line": 8,
-              "Text": "now simply went on by her own momentum.  The dark-"
-          },
-          {
-              "Page": 31,
-              "Line": 9,
-              "Text": "ness was then profound; and however good the Canadian\'s"
-          },
-          {
-              "Page": 31,
-              "Line": 10,
-              "Text": "eyes were, I asked myself how he had managed to see, and"
-          } 
-      ] 
+    "Title": "Twenty Thousand Leagues Under the Sea",
+    "ISBN": "9780000528531",
+    "Content": [
+        {
+            "Page": 31,
+            "Line": 8,
+            "Text": "now simply went on by her own momentum.  The dark-"
+        },
+        {
+            "Page": 31,
+            "Line": 9,
+            "Text": "ness was then profound; and however good the Canadian\'s"
+        },
+        {
+            "Page": 31,
+            "Line": 10,
+            "Text": "eyes were, I asked myself how he had managed to see, and"
+        } 
+    ] 
   }
-]
+];
   
 /** Example output object */
 const twentyLeaguesOut = {
   "SearchTerm": "the",
   "Results": [
-      {
-          "ISBN": "9780000528531",
-          "Page": 31,
-          "Line": 9
-      }
+    {
+        "ISBN": "9780000528531",
+        "Page": 31,
+        "Line": 9
+    }
   ]
-}
+};
 
 /*
 _   _ _   _ ___ _____   _____ _____ ____ _____ ____  
@@ -96,6 +118,7 @@ if (JSON.stringify(twentyLeaguesOut) === JSON.stringify(test1Result)) {
   console.log("Received:", test1Result);
 }
 
+
 /** We could choose to check that we get the right number of results. */
 const test2Result = findSearchTermInBooks("the", twentyLeaguesIn); 
 if (test2Result.Results.length == 1) {
@@ -106,27 +129,27 @@ if (test2Result.Results.length == 1) {
   console.log("Received:", test2Result.Results.length);
 }
 
-/** initial result of `findSearchTermInBooks()`  */
-const initialResult = {
-  "SearchTerm": "the",
-  "Results": []
-};
 
 /** 
- * An array of JSON objects should be passed into `scannedTextObj`. 
- * If we receive an object, string, number, or null/undefined, 
- * then the initial `result` should be returned. 
+ * `searchTerm` should be a string, if it is an array, object, string, 
+ * number, or null/undefined then return the initial result.
  */
-const invalidScannedTextObj = {
-  "Test 3": {}, 
-  "Test 4": "Twenty thousand leagues", 
+const invalidSearchTerm = {
+  "Test 3": [], 
+  "Test 4": {}, 
   "Test 5": 31, 
   "Test 6": null, 
   "Test 7": undefined
 };
 
-for(const key in invalidScannedTextObj) {
-  const testResult = findSearchTermInBooks("the", invalidScannedTextObj[key]);
+for(const key in invalidSearchTerm) {
+  /** initial result of `findSearchTermInBooks()`  */
+  const initialResult = {
+    "SearchTerm": invalidSearchTerm[key],
+    "Results": []
+  };
+
+  const testResult = findSearchTermInBooks(invalidSearchTerm[key], twentyLeaguesIn);
   if(JSON.stringify(initialResult) === JSON.stringify(testResult)) {
     console.log(`PASS: ${key}`);
   }
@@ -137,17 +160,114 @@ for(const key in invalidScannedTextObj) {
   }
 }
 
-/** If `scannedTextObj` has a length of zero, then return the initial result */
-const test8Result = findSearchTermInBooks("the", []); 
-if (JSON.stringify(initialResult) === JSON.stringify(test8Result)) {
-  console.log("PASS: Test 8");
-} else {
-  console.log("FAIL: Test 8");
-  console.log("Expected:", initialResult);
-  console.log("Received:", test8Result);
+
+/** 
+ * An array of JSON objects should be passed into `scannedTextObj`. 
+ * If we receive an object, string, number, or null/undefined, 
+ * then the initial result should be returned. 
+ */
+const mockSearchTerm = "the";
+const invalidScannedTextObj = {
+  "Test 8": {}, 
+  "Test 9": "Twenty thousand leagues", 
+  "Test 10": 31, 
+  "Test 11": null, 
+  "Test 12": undefined
+};
+
+for(const key in invalidScannedTextObj) {
+  /** initial result of `findSearchTermInBooks()`  */
+  const initialResult = {
+    "SearchTerm": mockSearchTerm,
+    "Results": []
+  };
+  const testResult = findSearchTermInBooks(mockSearchTerm, invalidScannedTextObj[key]);
+  if(JSON.stringify(initialResult) === JSON.stringify(testResult)) {
+    console.log(`PASS: ${key}`);
+  }
+  else {
+    console.log(`FAIL: ${key}`);
+    console.log("Expected:", initialResult);
+    console.log("Received:", testResult);
+  }
 }
 
 
+/** If `scannedTextObj` has a length of zero, then return the initial result */
+const initialResult = {
+  "SearchTerm": "the",
+  "Results": []
+};
+const test13Result = findSearchTermInBooks("the", []); 
+if (JSON.stringify(initialResult) === JSON.stringify(test13Result)) {
+  console.log("PASS: Test 13");
+} else {
+  console.log("FAIL: Test 13");
+  console.log("Expected:", initialResult);
+  console.log("Received:", test13Result);
+}
+
+
+/** 
+ * If `scannedTextObj` has two books but one of them has no content,
+ * then our output should only have results from one ISBN number. 
+ */
+ const test14MockObj = [
+  {
+    "Title": "Twenty Thousand Leagues Under the Sea",
+    "ISBN": "9780000528531",
+    "Content": [
+        {
+            "Page": 31,
+            "Line": 8,
+            "Text": "now simply went on by her own momentum.  The dark-"
+        },
+        {
+            "Page": 31,
+            "Line": 9,
+            "Text": "ness was then profound; and however good the Canadian\'s"
+        },
+        {
+            "Page": 31,
+            "Line": 10,
+            "Text": "eyes were, I asked myself how he had managed to see, and"
+        } 
+    ] 
+  },
+  {
+    "Title": "Siddhartha",
+    "ISBN": "8503845691257",
+    "Content": [] 
+  }
+];
+  
+const test14MockOutput = {
+  "SearchTerm": "the",
+  "Results": [
+      {
+          "ISBN": "9780000528531",
+          "Page": 31,
+          "Line": 9
+      },
+      {
+        "ISBN": "9780000528532",
+        "Page": 32,
+        "Line": 10
+    }
+  ]
+};
+
+/** Add each ISBN into an array, test passes if there is only one ISBN  */
+const test14Result = findSearchTermInBooks("the", test14MockObj);
+const test14ResultLength = test14Result.Results.map(result => result.ISBN).length;
+console.log(test14ResultLength);
+if (test14ResultLength === 1) {
+  console.log("PASS: Test 14");
+} else {
+  console.log("FAIL: Test 14");
+  console.log("Expected:", test14MockOutput);
+  console.log("Received:", test14Result);
+}
 
 
 

@@ -53,16 +53,13 @@ i.e.
 Note:
 - returned JSON object may have zero or more results from scanned content 
 
+After laying out what I'm being asked to implement, going over the arguments the function should take in, and what its return value should be, I dive right into test-driven development. By writing unit tests in tandem with a new feature you can effectively catch errors ahead of time before its too late. 
 
-My first thought with JSON data would be to use recursion, but we are not working with nested data. Plus, within "Content" we won't be finding sub-book objects that contain more "Content" objects. Therefore, I think an iterative solution will work well for this problem. 
+My first thought when handling JSON data would be a recursive technique, but we are not working with deeply nested data. Plus, within "Content" we won't be finding sub objects that contain more "Content" objects. Therefore, I think an iterative solution will work well for this problem. 
 
-First, we should always check if the data being passed into our function is correct or not. We should be receiving an array, so lets check for that first. 
+Second, we should always check if the data being passed into our function is correct or not. We are requesting a string for `searchTerm`. For test case 3-7, if we don't receive a string then lets return the initial result. We should also be receiving an array for `scannedTextObj`. So for test cases 8-12 lets check that the initial result is returned for object, string, number, null, or undefined values. 
 
-Second off, I know that `scannedTextObj` will have zero or many books. This will be our base case. If we have no books, then there are is no content to parse, so we'd simply return:
+Next, I know that `scannedTextObj` will have zero or many books. This will be our next test case. If we have no books, then there are is no content to parse, so we'd simply return the initial result. 
 
-{
-  "SearchTerm": searchTerm,
-  "Results": []
-}
-
+After writing up these initial tests, I realized that my conditional statements were getting lengthy, which was making the if blocks difficult to read. As a result, I've moved these conditions to their own lines and assigned them to variables `validSearchTerm` and `validScannedTextObj` to make it more legible. 
 
