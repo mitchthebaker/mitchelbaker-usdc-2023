@@ -72,3 +72,10 @@ At this point we are only working with books that have content. So we can safely
 For each item in a book's content, it has the page number, the line number, and the text corresponding to each line. The problem statement asks us to return lines that match the search term. In other words, if the line contains our search term, then we return that line. To match our search term, we will be using a regular expression to check for the first occurrence of our search term. I won't go in depth into how regular expressions work, because what matters is if a line has a match with our search term. This is indicated with the .match() function. If there is a match, then .match() will tell us the word matched and other metadata. If there is no match, then .match() returns null. Therefore, if .match() does not return null, we add a new result into `result.Results` with the book ISBN, page number, and line number. 
 
 
+Additional notes:
+
+Add a comment about reason behind regex expression. We are only checking if the search term exists one time in the text with case sensitivity in mind.
+Talk about where we could optimize this function! 
+- I'd like to pull result out of the function body and pass it in as an argument to make this truly a pure function. maybe rename to initialResult as seen in tests and pass it in as an arg as result = initialResult. 
+- We are working with nested json data so cant optimize two loops, even if data struct was flattened 
+
