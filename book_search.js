@@ -25,11 +25,11 @@
       "Results": []
   };
   
-  const validSearchTerm = typeof searchTerm !== "string";
-  if(validSearchTerm) return result;
+  const invalidSearchTerm = typeof searchTerm !== "string";
+  if(invalidSearchTerm) return result;
 
-  const validScannedTextObj = !Array.isArray(scannedTextObj) || scannedTextObj.length === 0 || scannedTextObj === null || scannedTextObj === undefined;
-  if(validScannedTextObj) return result;
+  const invalidScannedTextObj = !Array.isArray(scannedTextObj) || scannedTextObj.length === 0 || scannedTextObj === null || scannedTextObj === undefined;
+  if(invalidScannedTextObj) return result;
 
   /** 
    * If we've reached this point we can infer that we have a valid search term
