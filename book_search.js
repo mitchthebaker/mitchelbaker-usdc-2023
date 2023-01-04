@@ -347,6 +347,49 @@ if (JSON.stringify(test15Output) === JSON.stringify(test15Result)) {
   console.log("Received:", test15Result);
 }
 
+/**
+ * Function should be case sensitive. A search term of 'The' should not match 'the'.
+ */
+/** Example input object. */
+const test16Input = [
+  {
+    "Title": "Twenty Thousand Leagues Under the Sea",
+    "ISBN": "9780000528531",
+    "Content": [
+        {
+            "Page": 31,
+            "Line": 8,
+            "Text": "now simply went on by her own momentum.  The dark-"
+        },
+        {
+            "Page": 31,
+            "Line": 9,
+            "Text": "ness was then profound; and however good the Canadian\'s"
+        },
+        {
+            "Page": 31,
+            "Line": 10,
+            "Text": "eyes were, I asked myself how he had managed to see, and"
+        } 
+    ] 
+  }
+];
+  
+/** Example output object */
+const test16Output = {
+  "SearchTerm": "California",
+  "Results": []
+};
+
+const test16Result = findSearchTermInBooks("California", test16Input);
+if (test16Result.Results.length == 0) {
+  console.log("PASS: Test 16");
+} else {
+  console.log("FAIL: Test 16");
+  console.log("Expected:", test16Output.Results.length);
+  console.log("Received:", test16Result.Results.length);
+}
+
 
 
 
