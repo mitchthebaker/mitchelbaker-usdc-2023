@@ -59,6 +59,5 @@ Additional notes:
 Add a comment about reason behind regex expression. We are only checking if the search term exists one time in the text with case sensitivity in mind.
 
 Talk about where we could optimize this function! 
-- I'd like to pull result out of the function body and pass it in as an argument to make this truly a pure function. maybe rename to initialResult as seen in tests and pass it in as an arg as result = initialResult. 
 - We are working with nested json data so cant optimize two loops, even if data struct was flattened 
 
