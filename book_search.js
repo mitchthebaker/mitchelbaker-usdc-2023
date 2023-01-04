@@ -25,11 +25,11 @@
       "Results": []
   };
   
-  const validSearchTerm = typeof searchTerm !== "string";
-  if(validSearchTerm) return result;
+  const invalidSearchTerm = typeof searchTerm !== "string";
+  if(invalidSearchTerm) return result;
 
-  const validScannedTextObj = !Array.isArray(scannedTextObj) || scannedTextObj.length === 0 || scannedTextObj === null || scannedTextObj === undefined;
-  if(validScannedTextObj) return result;
+  const invalidScannedTextObj = !Array.isArray(scannedTextObj) || scannedTextObj.length === 0 || scannedTextObj === null || scannedTextObj === undefined;
+  if(invalidScannedTextObj) return result;
 
   /** 
    * If we've reached this point we can infer that we have a valid search term
@@ -210,8 +210,8 @@ if (JSON.stringify(initialResult) === JSON.stringify(test13Result)) {
 
 
 /** 
- * If `scannedTextObj` has two books but one of them has no content,
- * then our output should only have results from one ISBN number. 
+ * If `scannedTextObj` has three books but one of them has no content,
+ * then our output should only have results from two ISBN numbers. 
  */
  const test14MockObj = [
   {
@@ -296,6 +296,57 @@ if (uniqueISBN.size === 2) {
   console.log("Expected:", test14MockOutput);
   console.log("Received:", test14Result);
 }
+
+
+/**
+ * Function should be case sensitive. A search term of 'The' should not match 'the'.
+ */
+/** Example input object. */
+const test15Input = [
+  {
+    "Title": "Twenty Thousand Leagues Under the Sea",
+    "ISBN": "9780000528531",
+    "Content": [
+        {
+            "Page": 31,
+            "Line": 8,
+            "Text": "now simply went on by her own momentum.  The dark-"
+        },
+        {
+            "Page": 31,
+            "Line": 9,
+            "Text": "ness was then profound; and however good the Canadian\'s"
+        },
+        {
+            "Page": 31,
+            "Line": 10,
+            "Text": "eyes were, I asked myself how he had managed to see, and"
+        } 
+    ] 
+  }
+];
+  
+/** Example output object */
+const test15Output = {
+  "SearchTerm": "The",
+  "Results": [
+    {
+        "ISBN": "9780000528531",
+        "Page": 31,
+        "Line": 8
+    }
+  ]
+};
+
+const test15Result = findSearchTermInBooks("The", test15Input);
+if (JSON.stringify(test15Output) === JSON.stringify(test15Result)) {
+  console.log("PASS: Test 15");
+} else {
+  console.log("FAIL: Test 15");
+  console.log("Expected:", test15Output);
+  console.log("Received:", test15Result);
+}
+
 
 
 
